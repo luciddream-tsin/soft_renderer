@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
 project(soft_render)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bins)
+
+
+
+
 add_library(tga STATIC ext/tgaimage.cpp ext/tgaimage.h)
 target_include_directories(tga PUBLIC ext)
 
@@ -9,3 +14,12 @@ target_include_directories(model PUBLIC ext)
 
 
 add_subdirectory(lesson-0)
+add_subdirectory(lesson-1)
+
+
+
+
+
+
+
+add_subdirectory(mine-test)
