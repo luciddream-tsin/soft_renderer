@@ -210,7 +210,7 @@ void triangle_4(float *zbuffer, vec3f *triang_vtxs, vec2 *triang_uvs, TGAImage &
             if (coord.x<0 || coord.y<0 || coord.z<0){continue;}
 
             //直接使用像素点的重心坐标， 计算出z的插值
-            //三角形顶点的z，还是0-1范围， 所以记得zbuffer 要用float
+            //三角形顶点的z，还是-1 - 1范围， 所以记得zbuffer 要用float
             for (int k = 0; k < 3; ++k) {
                 p.z += triang_vtxs[k].z * coord[k];
             }

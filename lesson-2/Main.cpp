@@ -35,8 +35,8 @@ vec3f barycenter(vec2i *ps, vec2i p){
              (double)(ps[2].y - ps[0].y), //AC.y
              (double)(ps[0].y - p.y)};    //PA.y
 
-    auto cross_ = cross(X, Y);
-    //auto cross_ = mine_cross(X, Y);
+    //auto cross_ = cross(X, Y);
+    auto cross_ = mine_cross(X, Y);
     double u = (cross_.x / cross_.z);
     double v = (cross_.y / cross_.z);
     return vec3f{u, v, 1 - u - v};
@@ -109,6 +109,7 @@ int main()
     vec3f light_dir{0, 0, -1};
     lambert_lighting(light_dir, model, image);
 
+    //FIXME : some small black point in result.
     image.write_tga_file("out.tga");
     return 0;
 }
