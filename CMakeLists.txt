@@ -15,9 +15,7 @@ target_include_directories(model PUBLIC ext)
 
 add_subdirectory(lesson-0)
 add_subdirectory(lesson-1)
-
-
-
+add_subdirectory(lesson-2)
 
 
 
