@@ -14,15 +14,54 @@ const int h = 800;
 //define zbuffer globally.
 std::vector<double> zbuffer;
 
-vec3f mine_cross(vec3f &X, vec3f &Y){
-    vec3f cross_{
-            X.y*Y.z - X.z*Y.y,
-            X.z*Y.x - X.x*Y.z,
-            X.x*Y.y - X.y*Y.x
-    };
+//FIXME : when the direction is {-1, -1, -1}, som black face loss in front.
+vec3f light_dir = vec3f{0, 0, -1}.normalize();
 
-    return cross_;
+vec3f eye{2, 2, 4}; // position, z not too small , inner the model will wrong.
+vec3f center{0, 0, 0};// look at
+
+mat4 modelview(vec3f eye, vec3f center, vec3f up){
+    //-------------------model------------------
+
+
+    //---------camera view (look at)------------
+    vec3f z = (eye - center).normalize();
+    //note the order of cross v1 and v2.
+    vec3f x = cross(up, z).normalize();
+    vec3f y = cross(z, x).normalize();
+
+    mat4 view = mat4::identity();
+    for (int i = 0; i < 3; ++i) {
+       view[0][i] = x[i];
+       view[1][i] = y[i];
+       view[2][i] = z[i];
+
+       view[i][3] = -center[i];
+    }
+    return view;
 }
+mat4 viewport(int dx, int dy, int rt_w, int rt_h){
+    mat4 m = mat4::identity();
+    m[0][0] = rt_w / 2.;
+    m[1][1] = rt_h / 2.;
+    m[2][2] = 1.0;
+
+    m[0][3] = dx + rt_w / 2.;
+    m[1][3] = dy + rt_h / 2.;
+    m[2][3] = 0.0;
+
+    return m;
+}
+
+mat4 projection()
+{
+    mat4 matrix = mat4::identity();
+
+    //projection
+    matrix[3][2] = -1.f / (eye - center).norm();
+    return matrix;
+}
+
 
 //
 vec3f barycenter(vec3f *ps, vec2f p){// we don't use z of three ps to calculate barycenter.
@@ -42,8 +81,7 @@ vec3f barycenter(vec3f *ps, vec2f p){// we don't use z of three ps to calculate 
              (ps[1].y - ps[0].y), //AC.y
              (ps[0].y - p.y)};    //PA.y
 
-    //auto cross_ = cross(X, Y);
-    auto cross_ = mine_cross(X, Y);
+    auto cross_ = cross(X, Y);
     double u = (cross_.x / cross_.z);
     double v = (cross_.y / cross_.z);
     //return vec3f{1-u-v, u, v};
@@ -82,8 +120,7 @@ void triangle(vec3f *ps, vec2f *uvs, TGAImage &image, double intensity, Model &m
 
             TGAColor color = model.diffuse(uv) * intensity;
 
-
-            if (zbuffer[int(p.x + p.y * w)] < p.z) {
+            if (zbuffer.at(int(p.x + p.y * w)) < p.z) { // use 'at' check out of range.
                 zbuffer[int(p.x + p.y * w)] = p.z;
                 image.set(p.x, p.y, color);
             }
@@ -91,6 +128,15 @@ void triangle(vec3f *ps, vec2f *uvs, TGAImage &image, double intensity, Model &m
     }
 }
 void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
+
+    //model and view matrix
+    mat4 mv = modelview(eye, center, vec3f(0, 1, 0));
+
+    //projection matrix
+    mat4 pj = projection();
+
+    //view port matrix to screen
+    mat4 vp = viewport(w / 8, h / 8, w * 3 / 4, h * 3 / 4);
 
     for (int i = 0; i < model.nfaces(); ++i) {
 
@@ -103,13 +149,16 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
         for (int j = 0; j < 3; ++j) {
             vec3f v = model.vert(i, j);
 
-            //因为到目前为止，我们都是在正交投影，还没有加入透视投影，
-            //所以我们就是直接利用模型的xy坐标进行绘制三角形和平行投影，
-            //由于模型的尺寸是在-1到1所以我们把它放大到图片的尺寸空间就是图片的宽度和高度
-            // we keep the z in range (-1, 1)
-            screen_coords[j] = {(v.x+1)/2*image.get_width(),
-                                (v.y+1)/2*image.get_height(),
-                                v.z };
+
+
+            auto coord  = embed<4>(  pj *  mv * embed<4>(v));
+            //model_view and projection, you should devide w
+            screen_coords[j].x = coord[0]/coord[3];
+            screen_coords[j].y = coord[1]/coord[3];
+            screen_coords[j].z = coord[2]/coord[3];
+
+            // viewport
+            screen_coords[j] = embed<3>(vp * embed<4>(screen_coords[j]));
 
             uv_coords[j] = model.uv(i, j);
 
@@ -133,13 +182,12 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
 
 int main()
 {
-
     //remember to turn texture on! (and normal spec, if you need)
     Model model{"../obj/african_head.obj", true};
     TGAImage image(w, h, TGAImage::RGB);
     zbuffer = std::vector<double>(w * h, -std::numeric_limits<double>::max());
-    vec3f light_dir{0, 0, -1};
-    lambert_lighting(light_dir, model, image);
+
+    lambert_textured_lighting(light_dir, model, image);
     //FIXME : some small black point in result.
     image.write_tga_file("out.tga");
     return 0;
