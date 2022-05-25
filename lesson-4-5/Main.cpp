@@ -58,6 +58,7 @@ mat4 projection()
     mat4 matrix = mat4::identity();
 
     //projection
+    //FIXME : when the eye is very far, but the head not very small
     matrix[3][2] = -1.f / (eye - center).norm();
     return matrix;
 }
@@ -117,7 +118,6 @@ void triangle(vec3f *ps, vec2f *uvs, TGAImage &image, double intensity, Model &m
                 uv.x += (bc_screen[i] * uvs[i].x);
                 uv.y += (bc_screen[i] * uvs[i].y);
             };
-
             TGAColor color = model.diffuse(uv) * intensity;
 
             if (zbuffer.at(int(p.x + p.y * w)) < p.z) { // use 'at' check out of range.
