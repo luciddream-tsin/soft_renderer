@@ -23,7 +23,6 @@ vec3f center{0, 0, 0};// look at
 mat4 modelview(vec3f eye, vec3f center, vec3f up){
     //-------------------model------------------
 
-
     //---------camera view (look at)------------
     vec3f z = (eye - center).normalize();
     //note the order of cross v1 and v2.

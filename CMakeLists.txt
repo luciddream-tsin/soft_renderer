@@ -16,8 +16,8 @@ add_subdirectory(lesson-2)
 add_subdirectory(lesson-3)
 add_subdirectory(lesson-4-5)
 add_subdirectory(lesson-6)
+add_subdirectory(lesson-7)
 
-add_subdirectory(lesson-tmp)
 
 
 add_subdirectory(mine-test)

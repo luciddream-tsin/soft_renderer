@@ -2,15 +2,15 @@
 // Created by tsin on 22-5-25.
 //
 
-#ifndef SOFT_RENDER_SHADER_H
+#ifndef SOFT_RENDER_BASEPASSSHADER_H
 #define SOFT_RENDER_SHADER_H
 
 
 #include "IOurGL.h"
 
-class Shader : public IOurGL{
+class BasePassShader : public IOurGL{
 public:
-    Shader(Model *model, TGAImage *rt, int rt_scale_w, int rt_scale_h, vec3f eye, vec3f center, vec3f light_dir);
+    BasePassShader(Model *model, TGAImage *rt, int rt_scale_w, int rt_scale_h, vec3f eye, vec3f center, vec3f light_dir);
 
     vec3f vertex(int i) override;
 
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //SOFT_RENDER_SHADER_H
+#endif //SOFT_RENDER_BASEPASSSHADER_H
