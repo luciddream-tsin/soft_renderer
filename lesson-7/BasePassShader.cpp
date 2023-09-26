@@ -42,5 +42,5 @@ void BasePassShader::fragment(mat<3,3> gl_vertexes, vec3f barycenter, TGAColor &
         uv.y += (barycenter[i] * uniform_uvs[i].y);
     };
     auto cc = sample2D(uv, intensity);
-    color = cc*shadow;
+    color = cc * shadow;
 }
