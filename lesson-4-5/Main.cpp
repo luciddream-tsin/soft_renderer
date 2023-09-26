@@ -140,7 +140,8 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
     for (int i = 0; i < model.nfaces(); ++i) {
 
         //------------------------------------------------------------
-        // all is float to adapt z buffer, although it's no necessary.
+
+
         vec3f screen_coords[3];
         vec3f world_coords[3];
         vec2f uv_coords[3];
@@ -148,6 +149,13 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
         for (int j = 0; j < 3; ++j) {
             vec3f v = model.vert(i, j);
 
+
+            // 将每个顶点的xy转换到屏幕空间范围, 已经在视口矩阵完成
+            // screen_coords[j] = {
+            //      (v.x+1)/2*image.get_width(),
+            //      (v.y+1)/2*image.get_height(),
+            //      v.z
+            // };
 
 
             auto coord  = embed<4>(  pj *  mv * embed<4>(v));
@@ -161,8 +169,8 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
 
             uv_coords[j] = model.uv(i, j);
 
-            //而模型的法线hai得用原始的，三角形面的法线等，
-            //我们还是利用模型原始的数值进行计算，for decrease 误差，这也比较合理
+            //而模型的法线还得用原始的，三角形面的法线等，
+            //我们还是利用模型原始的数值进行计算, 为了减小误差，这也比较合理
             world_coords[j] = v;
         }
 
@@ -172,7 +180,7 @@ void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
         double intensity = dot(n, light_dir);
 
         //------------------------------------------------------------
-        if (intensity > 0) // back calling----------------------------
+        if (intensity > 0) // 背面剔除
             triangle(screen_coords, uv_coords, image, intensity, model);
     }
 }

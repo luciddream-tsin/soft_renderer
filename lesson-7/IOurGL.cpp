@@ -29,9 +29,9 @@ vec3f barycenter(mat<3,3> ps, vec2f p){// we don't use z of three ps to calculat
 }
 
 IOurGL::IOurGL(Model *model, TGAImage *rt, int rt_scale_w, int rt_scale_h, vec3f eye, vec3f center, vec3f light_dir)
-:model(model), rt(rt), rt_w(rt->get_width()), rt_h(rt->get_height()),
-rt_scale_w(rt_scale_w),
-rt_scale_h(rt_scale_h), eye(eye), center(center), light_dir(light_dir){
+        :model(model), rt(rt), rt_w(rt->get_width()), rt_h(rt->get_height()),
+         rt_scale_w(rt_scale_w),
+         rt_scale_h(rt_scale_h), eye(eye), center(center), light_dir(light_dir){
 
     this->dx = (rt_w - rt_scale_w) / 2;
     this->dy = (rt_h - rt_scale_h) / 2;

@@ -82,8 +82,8 @@ void lambert_lighting(vec3f light_dir, Model &model, TGAImage &image){
             //由于模型的尺寸是在-1到1所以我们把它放大到图片的尺寸空间就是图片的宽度和高度
             screen_coords[j] = {(int)((v.x + 1) / 2 * image.get_width()),
                                 (int)((v.y+1)/2*image.get_height())};
-            //而模型的法线hai得用原始的，三角形面的法线等，
-            //我们还是利用模型原始的数值进行计算，for decrease 误差，这也比较合理
+            //而模型的法线还得用原始的，三角形面的法线等，
+            //我们还是利用模型原始的数值进行计算, 为了减小误差，这也比较合理
             world_coords[j] = v;
         }
 
