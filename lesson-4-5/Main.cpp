@@ -17,7 +17,9 @@ std::vector<double> zbuffer;
 //FIXME : when the direction is {-1, -1, -1}, som black face loss in front.
 vec3f light_dir = vec3f{0, 0, -1}.normalize();
 
-vec3f eye{2, 2, 4}; // position, z not too small , inner the model will wrong.
+// TODO 修复位置很远时模型不缩小问题
+// TODO 修复不能随意调整center和eye问题
+vec3f eye{0, 0, 1.2}; // position, z not too small , inner the model will wrong.
 vec3f center{0, 0, 0};// look at
 
 mat4 modelview(vec3f eye, vec3f center, vec3f up){

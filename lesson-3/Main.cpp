@@ -78,7 +78,7 @@ void triangle(vec3f *ps, vec2f *uvs, TGAImage &image, double intensity, Model &m
             p.z = 0;
 
             //直接使用像素点的重心坐标， 计算出z的插值
-            //三角形顶点的z，还是(-1, 1)范围， 所以记得zbuffer 要用float
+            //三角形顶点的z，还是(-1, 1)范围， 所以记得z-buffer 要用float
             for (int i = 0; i < 3; ++i) p.z += (bc_screen[i] * ps[i][2]);
 
             vec2f uv{0, 0};// this is also only for one pixel.

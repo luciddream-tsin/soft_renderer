@@ -16,9 +16,15 @@ int main()
     TGAImage depth_buffer(w, h, TGAImage::GRAYSCALE);
 
     //-------------------------------------------------------------------------
-    vec3f light(0, 3, 5), center(0, 0, 0);
-    vec3f light_dir = vec3f (0,-3,-5).normalize();// NOTE: 这个只是方向不代表光照强度
+    bool switch_light = false;
 
+    vec3f light_0(+0, 3, 5);
+    vec3f light_1(-4, 3, 4);
+    vec3f light_r = switch_light ? light_0 : light_1;;
+
+    vec3f light_dir_0 = vec3f (0,-3,-5).normalize();// NOTE: 这个只是方向不代表光照强度
+    vec3f light_dir_1 = vec3f (1,-1,-1);// NOTE: 这个只是方向不代表光照强度
+    vec3f light_dir_r = switch_light ? light_dir_0 : light_dir_1;
 
     // 把点光源的位置当做相机位置, 传入shader, 即从光源看向场景, 不着色, 只是记录光栅化后每个片段到光源的深度
     /* 注意最后一句话, "记录光栅化后的每个fragment到光源的深度", 应当知道光栅化的每个片元是对假想的连续虚拟世界的离散
@@ -37,25 +43,23 @@ int main()
      * 当现在又一个视线看向被这个深度小块立起来的部分遮住(相对于光源)的点, 这个点就会被判断成阴影区域, 这并不完全是由于计算机的精度问题, 这还是由于光栅化离散导致的
      *
      * */
-    DepthBufferShader depth_shader(&model, &depth_buffer, (3.0 / 4) * w, (3.0 / 4) * h, light, center, light_dir);
+
+    // 注意这里的light_dir_r是作为center传入的
+    DepthBufferShader depth_shader(&model, &depth_buffer, (3.0 / 4) * w, (3.0 / 4) * h, light_r, light_dir_r);
     depth_shader.run();
 
-
-
-    vec3f eye{0, 0., 2};
+    vec3f eye{-4, 3., 4};
+    vec3f center(0, 0, 0);
     //---------------------------------------
-    BasePassShader base_shader(&model, &render_target, (3.0 / 4) * w, (3.0 / 4) * h, eye, center, light_dir);
+    BasePassShader base_shader(&model, &render_target, (3.0 / 4) * w, (3.0 / 4) * h, eye, center, light_dir_r);
 
     base_shader.set_mvp(depth_shader.get_mvp());
     base_shader.set_shadow_map(depth_buffer);
 
     base_shader.run();
 
-
-
-
     //---------------------------------------
-    // depth_buffer.write_tga_file("depth.tga");
+    depth_buffer.write_tga_file("depth.tga");
     render_target.write_tga_file("out.tga");
     return 0;
 }

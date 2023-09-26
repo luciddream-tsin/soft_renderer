@@ -27,13 +27,12 @@ void BasePassShader::fragment(mat<3,3> gl_vertexes, vec3f barycenter, TGAColor &
 
 
     //----------------------------
+    // 通过当前像素的重心坐标, 获得当前像素的坐标位置, 在把该位置通过光源视角的mvp矩阵, 得到该像素在shadow map中的像素坐标
+    // 可以看出再一次的, 针对一个像素点的, 以光源位置为相机的假装渲染, 对比第一次pass, 是得到整张shadow map的深度, 这一次是得到一个像素在shadow map中的位置
     vec4f sb_p = shadow_mvp * embed<4>(gl_vertexes * barycenter);  // corresponding point in the shadow buffer
     sb_p = sb_p / sb_p[3];
 
     auto c = shadow_map.get(int(sb_p[0]), int(sb_p[1]))[0];
-    double shadow = .3 + .7 * ( c <=
-                              sb_p[2]-170);  // magic coeff to avoid z-fighting
-
 
     //-----------------------------------
     vec2f uv{0, 0};//this is also only for one pixel.
@@ -42,5 +41,8 @@ void BasePassShader::fragment(mat<3,3> gl_vertexes, vec3f barycenter, TGAColor &
         uv.y += (barycenter[i] * uniform_uvs[i].y);
     };
     auto cc = sample2D(uv, intensity);
-    color = cc * shadow;
+
+    // 产生阴影
+    double shadow = .3 + .7 * ( c <= sb_p[2]*255);  // magic coeff to avoid z-fighting
+    color = cc;// * shadow;
 }

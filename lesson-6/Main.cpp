@@ -15,8 +15,8 @@ int main()
 
 
     //---------------------------------------
-    vec3f eye(2, 2, 10), center(0.2, 0, 0);
-    vec3f light_dir = vec3f (0,0,-2).normalize();
+    vec3f eye(2, 2, 300), center(1.2, 0, 0);
+    vec3f light_dir = vec3f (1, -1, -1).normalize();
     BasePassShader shader(&model, &image, (3.0 / 4) * w, (3.0 / 4) * h, eye, center, light_dir);
     shader.run();
 

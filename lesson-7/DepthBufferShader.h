@@ -9,7 +9,7 @@
 
 class DepthBufferShader : public IOurGL{
 public:
-    DepthBufferShader(Model *model, TGAImage *rt, int rt_scale_w, int rt_scale_h, vec3f eye, vec3f center, vec3f light_dir);
+    DepthBufferShader(Model *model, TGAImage *rt, int rt_scale_w, int rt_scale_h, vec3f eye, vec3f center);
 
     vec3f vertex(int i) override;
 

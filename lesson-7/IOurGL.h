@@ -48,9 +48,8 @@ private:
     Model *model;
     TGAImage *rt;
     int dx, dy;
-    int rt_w, rt_h;
-    int rt_scale_w, rt_scale_h;
+    int rt_w, rt_h; // 传进来用于保存渲染结果的rt图的大小
+    int rt_scale_w, rt_scale_h;// 实际渲染视图的大小(viewport 变幻大小)
 };
-
 
 #endif //SOFT_RENDER_IOURGL_H
