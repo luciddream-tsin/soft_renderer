@@ -17,12 +17,12 @@ std::vector<double> zbuffer;
 //FIXME : when the direction is {-1, -1, -1}, som black face loss in front.
 vec3f light_dir = vec3f{0, 0, -1}.normalize();
 
-// TODO 修复位置很远时模型不缩小问题
-// TODO 修复不能随意调整center和eye问题
-vec3f eye{0, 0, 1.2}; // position, z not too small , inner the model will wrong.
-vec3f center{0, 0, 0};// look at
+// FIXME 修复位置很远时模型不缩小问题, 官方也有这个问题
+// FIXME 修复不能随意调整center和eye问题
+vec3f eye{-3, -1, 2}; // position, z not too small , inner the model will wrong.
+vec3f center{3, -2, -3};// look at
 
-mat4 modelview(vec3f eye, vec3f center, vec3f up){
+mat4 modelview_first_transf(vec3f eye, vec3f center, vec3f up){
     //-------------------model------------------
 
     //---------camera view (look at)------------
@@ -37,10 +37,35 @@ mat4 modelview(vec3f eye, vec3f center, vec3f up){
        view[1][i] = y[i];
        view[2][i] = z[i];
 
-       view[i][3] = -center[i];
+       //这里 就该是 eye而不是center, 之前为什么会写成center?
+       view[i][3] = - eye[i];
     }
     return view;
 }
+
+// 添加函数先把顶点移到以相机为原点, 上面的是现在原坐标系进行基变换,
+// FIXME: 这个函数一定程度上可以转动视角, 和相机位置, 但是图像变的很小, 使用下面的参数依然会越界崩溃
+// vec3f eye{-3, -1, 2};
+// vec3f center{3, -2, -3};
+mat4 modelview_first_move(vec3f eye, vec3f center, vec3f up){
+    //-------------------model------------------
+
+    vec3f z = (eye-center).normalize();
+    vec3f x = cross(up,z).normalize();
+    vec3f y = cross(z,x).normalize();
+    mat4  Minv = mat4::identity();
+    mat4  Tr   = mat4::identity();
+    for (int i=0; i<3; i++) {
+        Minv[0][i] = x[i];
+        Minv[1][i] = y[i];
+        Minv[2][i] = z[i];
+        Tr[i][3] = -eye[i];
+    }
+    return Minv*Tr;
+}
+
+
+
 mat4 viewport(int dx, int dy, int rt_w, int rt_h){
     mat4 m = mat4::identity();
     m[0][0] = rt_w / 2.;
@@ -131,7 +156,7 @@ void triangle(vec3f *ps, vec2f *uvs, TGAImage &image, double intensity, Model &m
 void lambert_textured_lighting(vec3f light_dir, Model &model, TGAImage &image){
 
     //model and view matrix
-    mat4 mv = modelview(eye, center, vec3f(0, 1, 0));
+    mat4 mv = modelview_first_move(eye, center, vec3f(0, 1, 0));
 
     //projection matrix
     mat4 pj = projection();
